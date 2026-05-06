@@ -1,0 +1,70 @@
+{
+  "name": "Halo → 今日头条 同步管道",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://www.mindlynx.top/feed.xml",
+        "options": {}
+      },
+      "id": "rss-trigger",
+      "name": "RSS 读取",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "boolean": [],
+          "number": [],
+          "string": [
+            {"name": "title", "value": "={{ $json.title }}"},
+            {"name": "content", "value": "={{ $json.content }}"},
+            {"name": "link", "value": "={{ $json.link }}"},
+            {"name": "pubDate", "value": "={{ $json.isoDate }}"}
+          ]
+        },
+        "options": {}
+      },
+      "id": "filter-fields",
+      "name": "提取字段",
+      "type": "n8n-nodes-base.set",
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Markdown → 头条纯文本\nlet content = $input.first().json.content;\n\n// 移除 Markdown 图片语法\ncontent = content.replace(/!\\[.*?\\]\\(.*?\\)/g, '');\n// 移除代码块\ncontent = content.replace(/```[\\s\\S]*?```/g, '[代码示例]');\n// 移除内联代码\ncontent = content.replace(/`([^`]+)`/g, '$1');\n// 标题转换\ncontent = content.replace(/^### /gm, '');\ncontent = content.replace(/^## /gm, '');\ncontent = content.replace(/^# /gm, '');\n// 加粗\ncontent = content.replace(/\\*\\*(.*?)\\*\\*/g, '$1');\n// 链接\ncontent = content.replace(/\\[(.*?)\\]\\(.*?\\)/g, '$1');\n// 表格清理\ncontent = content.replace(/\\|.*?\\|/g, '');\n// 多余空行\ncontent = content.replace(/\\n{3,}/g, '\\n\\n');\n// 截断到头条限制（2000字）\nif (content.length > 2000) {\n  content = content.substring(0, 1997) + '...';\n}\n\n// 添加来源\nconst source = `\\n\\n—— 原文：${$input.first().json.link}`;\n\nreturn {\n  title: $input.first().json.title,\n  content: content.substring(0, 2000 - source.length) + source\n};"
+      },
+      "id": "convert-md",
+      "name": "格式转换",
+      "type": "n8n-nodes-base.code",
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.toutiao.com/api/article/publish",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "title", "value": "={{ $json.title }}"},
+            {"name": "content", "value": "={{ $json.content }}"},
+            {"name": "cover_image", "value": ""}
+          ]
+        },
+        "options": {}
+      },
+      "id": "toutiao-post",
+      "name": "发布到头条",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [850, 300]
+    }
+  ],
+  "connections": {
+    "RSS 读取": {"main": [[{"node": "提取字段", "type": "main", "index": 0}]]},
+    "提取字段": {"main": [[{"node": "格式转换", "type": "main", "index": 0}]]},
+    "格式转换": {"main": [[{"node": "发布到头条", "type": "main", "index": 0}]]}
+  }
+}
