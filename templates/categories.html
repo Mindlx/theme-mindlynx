@@ -1,0 +1,25 @@
+<!doctype html>
+<html
+  th:replace="~{modules/layout :: html(title = |#{page.categories.title} - ${site.title}|, hero = null, content = ~{::content}, head = null, footer = null, sidebar = ~{::sidebar}, contentClass = '')}"
+  xmlns:th="https://www.thymeleaf.org"
+>
+  <th:block th:fragment="content">
+    <th:block th:replace="~{modules/header}" />
+    <!--  Categories Title  -->
+    <th:block th:replace="~{modules/module :: pageHeader(prefix='pc', pageKey='categories', iconClass='fas fa-folder-open text-2xl text-gray-600 dark:text-white', iconSrc=null, iconAlt=null)}" />
+    <!--  Categories Card  -->
+    <section class="mx-auto max-w-6xl px-2 py-8 md:px-4">
+      <ul class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <th:block th:each="category : ${categories}">
+          <th:block th:replace="~{modules/module :: categoryCard(cat=${category})}" />
+        </th:block>
+        <th:block th:each="category : ${categories}" th:if="${not #lists.isEmpty(category.children)}">
+          <th:block th:each="child : ${category.children}">
+            <th:block th:replace="~{modules/module :: categoryCard(cat=${child})}" />
+          </th:block>
+        </th:block>
+      </ul>
+    </section>
+    <th:block th:replace="~{modules/footer}" />
+  </th:block>
+</html>

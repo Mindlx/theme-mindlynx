@@ -1,0 +1,49 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(title = |#{page.moments.title} - ${site.title}|, hero = null, content = ~{::content}, head = null, footer = null, sidebar = null, contentClass = '')}"
+>
+  <th:block th:fragment="content">
+    <th:block th:replace="~{modules/header}" />
+    <th:block th:replace="~{modules/module :: pageHeader(prefix='pm', pageKey='moments', iconClass=null, iconSrc=@{/assets/images/moments.svg}, iconAlt='moments')}" />
+    <section class="mx-auto max-w-4xl px-2 py-8 md:px-4">
+      <div class="scrollbar-hidden mb-6 flex items-center gap-2 overflow-x-auto rounded-2xl md:flex-wrap">
+        <button
+          th:classappend="${#lists.isEmpty(param.tag) ? '!bg-white !text-gray-900 dark:!bg-slate-700/70 dark:!text-slate-100' : ''}"
+          class="shrink-0 rounded-xl border border-transparent bg-gray-50/80 p-2 px-6 py-2 text-sm transition-colors dark:bg-white/5"
+        >
+          <a th:href="@{/moments}" th:text="#{common.all}"></a>
+        </button>
+        <button
+          th:each="tag : ${tags}"
+          th:classappend="${#lists.contains(param.tag, tag.name) ? '!bg-white !text-gray-900 dark:!bg-slate-700/70 dark:!text-slate-100' : ''}"
+          class="shrink-0 rounded-xl border border-transparent bg-gray-50/80 p-2 px-6 py-2 text-sm transition-colors dark:bg-white/5"
+        >
+          <a th:href="@{|?tag=${tag.name}|}">
+            <span th:text="|#${tag.name}|"></span>
+            <sup th:text="${tag.momentCount}"></sup>
+          </a>
+        </button>
+      </div>
+      <!--  moment content    -->
+      <ul class="space-y-6">
+        <th:block th:each="moment : ${moments.items}">
+          <th:block th:replace="~{modules/moment-list :: momentCard(${moment})}" />
+        </th:block>
+      </ul>
+      <th:block th:if="${moments.nextUrl}" th:replace="~{modules/module :: pagination(pagination=${moments})}" />
+    </section>
+    <th:block th:replace="~{modules/shareModal}" />
+    <th:block th:replace="~{modules/footer}" />
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const momentUpvote = new Upvote("halo.upvoted.moment.names", "moments", undefined, {}, "moment.halo.run", {
+          headerBtnAttr: '[data-moment-name="{name}"]',
+          header: '[data-moment-upvote="{name}"]',
+        });
+        momentUpvote.init();
+        setTimeout(() => shareModalInstance(), 100);
+      });
+    </script>
+  </th:block>
+</html>

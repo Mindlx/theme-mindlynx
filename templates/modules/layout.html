@@ -1,0 +1,143 @@
+<!doctype html>
+<html class="scroll-smooth" th:lang="${#locale.toLanguageTag}" th:fragment="html (head,content)" xmlns:th="https://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+    <meta content="width=device-width, initial-scale=1, minimum-scale=1" name="viewport" />
+    <title th:text="${title}"></title>
+    <meta property="og:title" th:content="${title}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" th:content="${site.url}" />
+    <meta property="og:image" th:content="${theme.config.index_info.default.logo ?: site.logo ?: '/upload/og-image.svg'}" />
+    <meta property="og:description" th:content="${theme.config.index_hero.hero_title.description ?: site.subtitle}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="description" th:content="${theme.config.index_hero.hero_title.description ?: site.subtitle}" />
+    <meta name="keywords" content="开源大模型,LLM,AI,模型评测,部署指南,大模型部署,DeepSeek,Qwen,RAG,AI Agent" />
+    <link rel="canonical" th:href="${site.url}" />
+    <link rel="alternate" type="application/rss+xml" th:href="@{/feed.xml}" th:title="|${site.title} RSS|" />
+    <link rel="icon" type="image/svg+xml" th:href="@{/upload/favicon.svg}" />
+    <link rel="manifest" th:href="@{/assets/images/manifest.json}" />
+    <meta name="theme-color" content="#6366f1" />
+    <link rel="stylesheet" th:href="@{/assets/css/style.css?v={version}(version=${theme.spec.version})}" />
+    <link rel="stylesheet" th:href="@{/assets/css/custom.css?v={version}(version=${theme.spec.version})}" />
+    <script th:src="@{/assets/js/main.js?v={version}(version=${theme.spec.version})}"></script>
+    <script th:inline="javascript">
+      window.themeConfig = {
+        theme_setting: /*[[${theme.config.index_info.info_setting.theme_setting ?: false}]]*/ false,
+      };
+    </script>
+    <th:block th:if="${head != null}">
+      <th:block th:replace="${head}" />
+    </th:block>
+  </head>
+  <body class="bg-gray-100 font-sans text-gray-900 transition-colors duration-200 dark:bg-gray-900 dark:text-white/70">
+    <div id="reading-progress"></div>
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-gray-900 focus:shadow-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:focus:bg-gray-800 dark:focus:text-white"
+    >跳到主要内容</a>
+    <th:block th:replace="~{modules/loading}" />
+    <th:block th:replace="${content}" />
+    <button
+      id="back-to-top"
+      class="pointer-events-none fixed right-8 bottom-8 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-white opacity-0 inset-ring shadow-lg inset-ring-gray-200 backdrop-blur-md transition-opacity duration-300 dark:bg-white/10 dark:inset-ring-white/10"
+      aria-label="回到顶部"
+    >
+      <svg class="h-5 w-5 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+      </svg>
+    </button>
+  </body>
+    <script defer th:src="@{/assets/js/axios.min.js?v={version}(version=${theme.spec.version})}"></script>
+    <script>
+      if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/assets/js/sw.js'); }
+    </script>
+    <script defer data-domain="mindlynx.top" src="https://umami.mindlynx.top/script.js"></script>
+    <script>
+      // Reading progress bar
+      (function(){var bar=document.getElementById('reading-progress');if(!bar)return;var ticking=false;function update(){var h=document.documentElement;var sh=h.scrollHeight-h.clientHeight;bar.style.width=sh?Math.min((h.scrollTop/sh)*100,100)+'%':'0%';ticking=false}window.addEventListener('scroll',function(){if(!ticking){requestAnimationFrame(update);ticking=true}},{passive:true})})();
+
+      // Reading time on blog cards
+      (function(){var cards=document.querySelectorAll('.reading-time-card');if(!cards.length)return;var speed={zh:350,en:225};cards.forEach(function(el){var chars=parseInt(el.getAttribute('data-chars'))||0;var lang=document.documentElement.lang||'zh';var cpm=lang.startsWith('zh')?speed.zh:speed.en;var mins=Math.max(1,Math.ceil(chars/cpm));el.textContent=mins+' '+(lang.startsWith('zh')?'分钟阅读':'min read')})})();
+    </script>
+    <script>
+      // ARIA state sync for theme toggle
+      (function() {
+        var observer = new MutationObserver(function() {
+          var isDark = document.documentElement.getAttribute("data-color-scheme") === "dark";
+          var toggle = document.getElementById("theme-toggle");
+          if (toggle) toggle.setAttribute("aria-checked", String(isDark));
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-color-scheme"] });
+        // Initial state
+        var isDark = document.documentElement.getAttribute("data-color-scheme") === "dark";
+        var toggle = document.getElementById("theme-toggle");
+        if (toggle) toggle.setAttribute("aria-checked", String(isDark));
+      })();
+
+      // ARIA state sync for mobile menu
+      (function() {
+        var btn = document.getElementById("mobile-btn");
+        if (!btn) return;
+        // Watch for icon-bar visibility change (toggled by main.js)
+        var iconBar = document.getElementById("icon-bar");
+        var observer = new MutationObserver(function() {
+          var isOpen = !iconBar.classList.contains("hidden");
+          btn.setAttribute("aria-expanded", String(isOpen));
+          btn.setAttribute("aria-label", isOpen ? "关闭菜单" : "打开菜单");
+        });
+        if (iconBar) observer.observe(iconBar, { attributes: true, attributeFilter: ["class"] });
+      })();
+    </script>
+  <script th:inline="javascript">
+    const i18n = {
+      text: /*[[#{widget.loadMore.text}]]*/,
+      loading: /*[[#{widget.loadMore.loading}]]*/,
+      complete: /*[[#{widget.loadMore.complete}]]*/,
+      error: /*[[#{widget.loadMore.error}]]*/
+    };
+    initLoadMoreForPage({
+      postsContainerSelector: '#blog-list',
+      getNextPageUrl: (page) => `/page/${page}`,
+      postSelector: "li",
+      insertPosition: "append",
+      i18n
+    });
+    initLoadMoreForPage({
+      postsContainerSelector: "ul.category-post",
+      getNextPageUrl: (page) => {
+        const path = window.location.pathname.replace(/\/p\d+$/, "");
+        return `${path}/page/${page}`;
+      },
+      postSelector: "li",
+      insertPosition: "before",
+      i18n
+    });
+    initLoadMoreForPage({
+      postsContainerSelector: "#archive-post-wrapper",
+      getNextPageUrl: (page) => {
+        const path = window.location.pathname.replace(/\/page\/\d+$/, "");
+        return `${path}/page/${page}`;
+      },
+      postSelector: ".archive-post",
+      insertPosition: "before",
+      minPostsThreshold: 1,
+      onInsert: (newNodes) => {
+        newNodes.forEach((monthNode) => {
+          monthNode.querySelectorAll("li").forEach((li) => loadPostImages(li));
+        });
+      },
+      i18n
+    });
+    initLoadMoreForPage({
+      postsContainerSelector: "ul.tag-post",
+      getNextPageUrl: (page) => {
+        const path = window.location.pathname.replace(/\/page\/\d+$/, "");
+        return `${path}/page/${page}`;
+      },
+      postSelector: "li",
+      insertPosition: "before",
+      i18n
+    });
+  </script>
+</html>

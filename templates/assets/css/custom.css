@@ -1,0 +1,120 @@
+/* ==================================================
+   Custom CSS — MindLynx theme patches & optimizations
+   ================================================== */
+
+/* --- CJK font rendering optimization --- */
+html {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "kern" 1, "liga" 1;
+}
+body {
+    text-rendering: optimizeLegibility;
+}
+
+/* --- Font loading: prevent FOIT --- */
+@font-face {
+    font-display: swap;
+}
+
+/* --- Shiki code block: disable filter in dark mode --- */
+shiki-code pre,
+[data-color-scheme="dark"] shiki-code pre {
+    filter: none;
+}
+
+/* --- Missing Tailwind utility classes (not in compiled style.css) --- */
+
+/* Flex */
+.flex-none {
+    flex: none;
+}
+
+/* Spacing */
+.py-6 {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+}
+
+/* Sizes */
+.w-20 {
+    width: 5rem;
+}
+@media (min-width: 48rem) {
+    .md\:w-24 {
+        width: 6rem;
+    }
+    .md\:h-24 {
+        height: 6rem;
+    }
+}
+
+/* Backgrounds */
+.bg-gray-200 {
+    background-color: #e5e7eb;
+}
+
+/* Dividers */
+.divide-y > :not([hidden]) ~ :not([hidden]) {
+    border-top-width: 1px;
+    border-top-style: solid;
+}
+.divide-gray-200\/60 > :not([hidden]) ~ :not([hidden]) {
+    border-color: rgba(229, 231, 235, 0.6);
+}
+
+/* Dark mode overrides (consistent with [data-color-scheme="dark"]) */
+[data-color-scheme="dark"] .dark\:divide-white\/10 > :not([hidden]) ~ :not([hidden]) {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+[data-color-scheme="dark"] .dark\:bg-white\/10 {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Adjacent sibling variants: first:pt-0, last:pb-0 */
+.py-6:first-child {
+    padding-top: 0;
+}
+.py-6:last-child {
+    padding-bottom: 0;
+}
+
+/* --- Hero parallax performance: remove will-change when idle --- */
+#bg {
+    will-change: auto;
+}
+
+/* --- Skip-to-content link --- */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+.focus\:not-sr-only:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+}
+
+/* --- Reading progress bar (opt-in, JS driven) --- */
+#reading-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    height: 3px;
+    background: linear-gradient(to right, #3b82f6, #8b5cf6);
+    transition: width 150ms ease-out;
+}

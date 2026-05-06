@@ -1,0 +1,94 @@
+<!doctype html>
+<html th:replace="~{modules/layout :: html(title = |${singlePage.spec.title} - ${site.title}|, head = ~{this :: pageHeadMeta},content = ~{::content})}" xmlns:th="https://www.thymeleaf.org">
+  <th:block th:fragment="pageHeadMeta">
+    <meta name="description" th:content="${singlePage.status.excerpt}" />
+    <meta property="og:title" th:content="${singlePage.spec.title}" />
+    <meta property="og:description" th:content="${singlePage.status.excerpt}" />
+    <meta property="og:image" th:content="${singlePage.spec.cover ?: '/upload/og-image.svg'}" />
+    <meta property="og:url" th:content="${site.url + singlePage.status.permalink}" />
+  </th:block>
+  <th:block th:fragment="content">
+    <th:block th:replace="~{modules/header}" />
+    <!-- About page: gradient header like category page -->
+    <th:block th:if="${#strings.equals(singlePage.spec.slug, 'about')}">
+      <div class="mt-16 relative overflow-hidden px-4 py-16 sm:px-6 sm:py-20 lg:px-8 gradient-bg-13">
+        <div class="absolute inset-0 bg-black/30"></div>
+        <div class="relative mx-auto max-w-3xl text-center">
+          <div class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 p-3 shadow-lg ring-1 ring-white/20 backdrop-blur-md sm:mb-5 sm:h-16 sm:w-16 sm:rounded-3xl sm:p-4">
+            <i class="fas fa-circle-info text-xl text-white sm:text-2xl"></i>
+          </div>
+          <h1 class="text-3xl font-bold text-white drop-shadow-lg sm:text-4xl" th:text="${singlePage.spec.title}"></h1>
+          <p class="mt-4 text-base text-white/80 drop-shadow sm:text-lg" th:text="${singlePage.status.excerpt}"></p>
+        </div>
+      </div>
+    </th:block>
+    <!-- Regular page: cover image + title below -->
+    <th:block th:unless="${#strings.equals(singlePage.spec.slug, 'about')}">
+      <img alt="封面" class="mt-18 aspect-square h-48 w-full object-cover lg:h-80" th:src="${singlePage.spec.cover ?: #theme.assets('/images/blog.avif')}" />
+    </th:block>
+    <div class="mx-auto mt-6 px-4 pb-8 sm:px-6 lg:mt-12 lg:px-8" th:classappend="${theme.config.index_info.info_setting.page_aside == true} ? 'max-w-6xl' : 'max-w-7xl'">
+      <div class="grid grid-cols-1 gap-8" th:classappend="${theme.config.index_info.info_setting.page_aside == true} ? 'xl:grid-cols-1' : 'xl:grid-cols-4'">
+        <div class="space-y-8" th:classappend="${theme.config.index_info.info_setting.page_aside == true} ? '' : 'lg:col-span-3 lg:mr-4'">
+          <h1 th:unless="${#strings.equals(singlePage.spec.slug, 'about')}" class="text-4xl leading-tight font-bold text-gray-900 lg:text-5xl dark:text-white" th:text="${singlePage.spec.title}"></h1>
+          <section class="prose max-w-full text-gray-900 dark:text-white/70" th:utext="${singlePage.content.content}"></section>
+          <th:block th:if="${#strings.equals(singlePage.spec.slug, 'about')}" th:with="stats = ${siteStatsFinder.getStats()}, categories = ${categoryFinder.listAll()}">
+            <div class="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-4">
+              <div class="rounded-xl bg-white p-6 text-center shadow-sm dark:bg-white/5">
+                <p class="text-3xl font-bold text-blue-600 dark:text-blue-400" th:text="${stats.post}"></p>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400" th:text="#{widget.profile.postCount.label}"></p>
+              </div>
+              <div class="rounded-xl bg-white p-6 text-center shadow-sm dark:bg-white/5">
+                <p class="text-3xl font-bold text-purple-600 dark:text-purple-400" th:text="${stats.category}"></p>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400" th:text="#{widget.profile.categoryCount.label}"></p>
+              </div>
+              <div class="rounded-xl bg-white p-6 text-center shadow-sm dark:bg-white/5">
+                <p class="text-3xl font-bold text-green-600 dark:text-green-400" th:text="${stats.visit}"></p>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400" th:text="#{widget.profile.visitCount.label}"></p>
+              </div>
+              <div class="rounded-xl bg-white p-6 text-center shadow-sm dark:bg-white/5">
+                <p class="text-3xl font-bold text-amber-600 dark:text-amber-400" th:text="${stats.comment}"></p>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400" th:text="#{widget.profile.commentCount.label}"></p>
+              </div>
+            </div>
+            <div class="mt-12">
+              <h2 class="mb-6 text-2xl font-bold text-gray-900 dark:text-white">内容分类</h2>
+              <div class="grid gap-4 sm:grid-cols-2">
+                <a th:each="cat : ${categories}"
+                   th:href="@{${cat.status.permalink}}"
+                   class="group rounded-xl bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md dark:bg-white/5">
+                  <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white" th:text="${cat.spec.displayName}"></h3>
+                    <span class="rounded-full bg-blue-50 px-3 py-1 text-sm text-blue-600 dark:bg-blue-900/30 dark:text-blue-300" th:text="${cat.status.visiblePostCount}"></span>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </th:block>
+          <div class="py-5 sm:py-8" th:if="${haloCommentEnabled}">
+            <halo:comment group="content.halo.run" kind="SinglePage" th:attr="name=${singlePage.metadata.name}" />
+            <span id="comment"></span>
+          </div>
+        </div>
+        <aside class="sticky top-24 hidden h-max w-full xl:col-span-1 xl:inline-block" th:if="${theme.config.index_info.info_setting.page_aside != true}">
+          <th:block th:replace="~{modules/sidebar :: sidebar(article=${singlePage}, tocMaxHeight='max-h-120')}" />
+        </aside>
+      </div>
+    </div>
+    <th:block th:replace="~{modules/donate}" />
+    <th:block th:replace="~{modules/footer}" />
+    <script th:src="@{/assets/js/tocbot.min.js}"></script>
+    <script th:inline="javascript">
+      const singlePageUpvote = new Upvote("halo.upvoted.singlepage.names", "singlepages", undefined, {
+        likedTitle: /*[[#{fragment.postWidget.likes.title}]]*/ "",
+        subtitle1: /*[[#{fragment.postWidget.likes.subtitle1}]]*/ "",
+        subtitle2: /*[[#{fragment.postWidget.likes.subtitle2}]]*/ "",
+      });
+    </script>
+    <script>
+      readingTime.calculate();
+      Tocbot();
+      singlePageUpvote.init();
+      initDonateModal();
+    </script>
+  </th:block>
+</html>

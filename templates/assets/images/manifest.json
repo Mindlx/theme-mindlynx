@@ -1,0 +1,13 @@
+{
+  "name": "MindLynx - 开源模型探索站",
+  "short_name": "MindLynx",
+  "description": "专注开源大模型技术评测与应用实践",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#111827",
+  "theme_color": "#6366f1",
+  "icons": [
+    {"src": "/themes/theme-mindlynx/assets/images/mindlynx_logo.svg", "sizes": "128x128", "type": "image/svg+xml"},
+    {"src": "/themes/theme-mindlynx/assets/images/mindlynx_logo.png", "sizes": "512x512", "type": "image/png"}
+  ]
+}

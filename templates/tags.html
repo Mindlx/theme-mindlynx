@@ -1,0 +1,67 @@
+<!doctype html>
+<html th:replace="~{modules/layout :: html(title = |#{page.tags.title} - ${site.title}|, head = null,content = ~{::content})}" xmlns:th="https://www.thymeleaf.org">
+  <th:block th:fragment="content">
+    <th:block th:replace="~{modules/header}" />
+    <!--  Tags Title  -->
+    <th:block th:replace="~{modules/module :: pageHeader(prefix='pt', pageKey='tags', iconClass='fas fa-tags text-2xl text-gray-600 dark:text-white sm:text-3xl', iconSrc=null, iconAlt=null)}" />
+    <section class="mx-auto max-w-6xl px-2 py-8 md:px-4">
+      <!--  Tags  -->
+      <ul class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <li
+          class="group space-y-3 overflow-hidden rounded-2xl bg-gray-400/5 p-4 backdrop-blur-sm transition-all duration-300 ease-out hover:-translate-y-2 dark:bg-white/5"
+          th:each="tag : ${tags}"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <i class="fas fa-tag"></i>
+              <span class="ml-1 text-sm font-medium" th:text="${tag.spec.displayName}"></span>
+            </div>
+            <div class="flex items-center space-x-0.5 text-xs text-gray-500 dark:text-gray-400">
+              <i class="fas fa-file-alt text-gray-400 dark:text-gray-500"></i>
+              <span th:text="${tag.postCount ?: 0} + ' ' + #{page.archives.title.post}"></span>
+            </div>
+          </div>
+          <div class="rounded-md bg-gray-50/80 p-2 dark:bg-white/5" th:with="posts = ${postFinder.listByTag(1,1,'__${tag.metadata.name}__')}">
+            <dl class="text-gray-500 dark:text-gray-400" th:each="post : ${posts.items}" th:if="${postStat.index == 0}">
+              <dt class="flex items-center space-x-0.5 text-xs">
+                <i class="fas fa-clock"></i>
+                <span class="text-xs" th:replace="~{modules/module :: formatDate(${post.spec.publishTime})}"></span>
+              </dt>
+              <dd class="text-xs">
+                <a
+                  class="flex items-center justify-between transition duration-300 group-hover:text-black dark:group-hover:text-white"
+                  th:href="@{${tag.status.permalink}}"
+                >
+                  <span class="text-sm font-medium" th:text="${post.spec.title}"></span>
+                  <div>
+                    <span th:text="#{page.categories.morePosts}"></span>
+                    <i class="fas fa-arrow-right"></i>
+                  </div>
+                </a>
+              </dd>
+            </dl>
+            <div class="text-xs text-gray-500 dark:text-gray-400" th:if="${#lists.isEmpty(posts.items)}">
+              <dt class="flex items-center space-x-0.5 text-xs">
+                <i class="fas fa-clock"></i>
+                <span class="text-xs" th:text="#{page.tags.empty}"></span>
+              </dt>
+              <dd class="text-xs">
+                <a
+                  class="flex items-center justify-between transition duration-300 group-hover:text-black dark:group-hover:text-white"
+                  th:href="@{${tag.status.permalink}}"
+                >
+                  <span class="text-sm font-medium" th:text="#{page.tags.null}"></span>
+                  <div>
+                    <span th:text="#{page.categories.morePosts}"></span>
+                    <i class="fas fa-arrow-right"></i>
+                  </div>
+                </a>
+              </dd>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </section>
+    <th:block th:replace="~{modules/footer}" />
+  </th:block>
+</html>

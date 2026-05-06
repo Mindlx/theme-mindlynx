@@ -1,0 +1,50 @@
+<!doctype html>
+<html th:replace="~{modules/layout :: html(title = |#{page.links.title} - ${site.title}|, head = null,content = ~{::content})}" xmlns:th="https://www.thymeleaf.org">
+  <th:block th:fragment="content">
+    <th:block th:replace="~{modules/header}" />
+    <th:block th:replace="~{modules/module :: pageHeader(prefix='pl', pageKey='links', iconClass=null, iconSrc=@{/assets/images/links.svg}, iconAlt='links')}" />
+    <section class="mx-auto max-w-6xl px-4 py-8 sm:px-0">
+      <th:block th:each="group,iterStat : ${groups}">
+        <div class="mb-6">
+          <div class="mb-4 flex items-center space-x-2">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white" th:text="${group.spec.displayName}"></h2>
+            <div class="flex items-center space-x-0.5 text-sm text-gray-500 dark:text-gray-400">
+              <i class="fas fa-people-arrows text-gray-400 dark:text-gray-500"></i>
+              <span th:text="|${#lists.size(group.links)} | + |#{page.links.site}|"></span>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <a
+              class="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-400/5 p-4 transition-all duration-300 hover:bg-gray-400/10 active:bg-gray-400/15 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700/50 dark:active:bg-gray-600/50"
+              th:each="link : ${group.links}"
+              target="_blank"
+              th:href="${link.spec.url}"
+            >
+              <div class="flex min-w-0 flex-1 items-center space-x-3">
+                <img
+                  alt="Avatar"
+                  class="h-10 w-10 shrink-0 rounded-full object-cover opacity-0 transition-opacity duration-500"
+                  th:src="${link.spec.logo}"
+                  th:attr="data-src=${link.spec.logo}"
+                />
+                <div class="min-w-0 flex-1">
+                  <h3 class="truncate text-sm font-medium text-gray-900 dark:text-white" th:text="${link.spec.displayName}"></h3>
+                  <p class="line-clamp-2 text-xs text-gray-600 dark:text-gray-400" th:text="${link.spec.description}"></p>
+                </div>
+              </div>
+              <i class="fas fa-external-link-alt ml-2 shrink-0 text-xs text-gray-400"></i>
+            </a>
+          </div>
+        </div>
+      </th:block>
+      <div
+        class="mt-16 rounded-2xl border border-gray-200 bg-gray-400/5 px-4 py-8 lg:px-8 dark:border-gray-700 dark:bg-gray-800"
+        th:if="${(theme.config.index_info.info_setting.link_enabled ?: false) and (haloCommentEnabled ?: false)}"
+      >
+        <halo:comment group="plugin.halo.run" kind="Plugin" th:attr="name=${pluginName}" />
+        <span id="comment"></span>
+      </div>
+    </section>
+    <th:block th:replace="~{modules/footer}" />
+  </th:block>
+</html>

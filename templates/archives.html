@@ -1,0 +1,81 @@
+<!doctype html>
+<html
+  th:replace="~{modules/layout :: html(title = |#{page.archives.title} - ${site.title}|, hero = null, content = ~{::content}, head = null, footer = null, sidebar = ~{::sidebar}, contentClass = '')}"
+  xmlns:th="https://www.thymeleaf.org"
+>
+  <th:block th:fragment="content">
+    <th:block th:replace="~{modules/header}" />
+    <!--  Archives Title  -->
+    <div class="mt-16 bg-gray-400/5 px-4 py-12 sm:px-6 sm:py-16 lg:px-8 dark:bg-white/5">
+      <div class="mx-auto max-w-3xl" th:with="stats = ${siteStatsFinder.getStats()}">
+        <div class="mb-4 flex flex-col items-center justify-center space-y-4">
+          <div class="page-icon">
+            <i class="fas fa-archive text-2xl text-gray-600 dark:text-white sm:text-3xl"></i>
+          </div>
+          <th:block th:with="paSetting = ${theme.config.page_setting.pa_setting}">
+            <h1
+              class="text-2xl font-bold text-gray-900/70 sm:text-3xl dark:text-white/70"
+              th:text="|${paSetting != null and paSetting.pa_enabled == true and paSetting.pa_title != null and paSetting.pa_title != ''}| ? |${paSetting.pa_title}| : |#{page.archives.title}|"
+            ></h1>
+            <p
+              class="text-center text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300"
+              th:text="|${paSetting != null and paSetting.pa_enabled == true and paSetting.pa_subtitle != null and paSetting.pa_subtitle != ''}| ? |${paSetting.pa_subtitle}| : |#{page.archives.subtitle}|"
+            ></p>
+          </th:block>
+        </div>
+        <div class="flex items-center justify-center space-x-4 text-xs text-gray-500 sm:flex-row sm:text-sm lg:space-x-8 dark:text-gray-400">
+          <div class="flex items-center">
+            <i class="fas fa-file-alt mr-2"></i>
+            <span th:text="|${stats.post} | + |#{page.archives.title.post}|"></span>
+          </div>
+          <div class="flex items-center">
+            <i class="fas fa-eye mr-2"></i>
+            <span id="StatsVisit" th:text="|${stats.visit} |+ |#{page.archives.title.visit}|"></span>
+          </div>
+          <div class="flex items-center">
+            <i class="fas fa-heart mr-2"></i>
+            <span id="StatsUpvote" th:text="|${stats.upvote} | + |#{page.archives.title.upvote}|"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--  Archives Card -->
+    <section class="mx-auto max-w-6xl px-2 py-8" id="archive-post-wrapper">
+      <th:block th:each="archive : ${archives.items}">
+        <div class="archive-post mb-8" th:each="month : ${archive.months}">
+          <div class="mx-2 mb-4 md:mb-8">
+            <div class="flex items-center space-x-6">
+              <div class="flex items-center space-x-3">
+                <i class="fas fa-calendar text-gray-400 dark:text-gray-500"></i>
+                <h2
+                  class="text-xl font-semibold text-gray-900 dark:text-white"
+                  th:text="#{page.archives.date_yearmonth(${archive.year}, ${month.month})}"
+                ></h2>
+              </div>
+              <div class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
+                <i class="fas fa-file-alt text-gray-400 dark:text-gray-500"></i>
+                <span th:text="|${#lists.size(month.posts)} |+ |#{page.archives.title.post}|"></span>
+              </div>
+            </div>
+          </div>
+          <ul class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <th:block th:replace="~{modules/module :: postBlog(posts = ${month.posts}, displayType = 'allCategories', shortDate = true)}"></th:block>
+          </ul>
+        </div>
+      </th:block>
+      <th:block th:if="${archives.hasNext()}">
+        <div class="mt-8 text-center" id="load-more-container"></div>
+      </th:block>
+    </section>
+    <th:block th:replace="~{modules/footer}" />
+    <script th:inline="javascript">
+      const readLabel = /*[[#{page.archives.title.visit}]]*/ "";
+      const StatsVisit = document.getElementById("StatsVisit");
+      if (StatsVisit) {
+        const rawValue = parseInt(StatsVisit.textContent.replace(/\D/g, ""), 10) || 0;
+        const formatted = new CategoryViewCount({ readLabel }).formatViews(rawValue);
+        StatsVisit.textContent = formatted + " " + readLabel;
+      }
+    </script>
+  </th:block>
+</html>

@@ -1,0 +1,97 @@
+<!doctype html>
+<html
+  th:replace="~{modules/layout :: html(title = |#{page.photos.title} - ${site.title}|, hero = null, content = ~{::content}, head = null, footer = null, sidebar = ~{::sidebar}, contentClass = '')}"
+  xmlns:th="https://www.thymeleaf.org"
+>
+  <th:block th:fragment="content">
+    <th:block th:replace="~{modules/header}" />
+    <th:block th:replace="~{modules/module :: pageHeader(prefix='pp', pageKey='photos', iconClass=null, iconSrc=@{/assets/images/photos.svg}, iconAlt='photos')}" />
+    <section class="mx-auto max-w-6xl px-2 py-8">
+      <div class="scrollbar-hidden mb-6 flex items-center gap-2 overflow-x-auto rounded-2xl md:flex-wrap">
+        <button
+          class="shrink-0 rounded-xl border border-transparent bg-gray-50/80 p-2 px-6 py-2 text-sm transition-colors dark:bg-white/5"
+          th:classappend="${#lists.isEmpty(param.group) ? '!bg-white !text-gray-900 dark:!bg-slate-700/70 dark:!text-slate-100' : ''}"
+        >
+          <a th:href="@{/photos}" th:text="#{common.all}"></a>
+        </button>
+        <button
+          th:each="group : ${photoFinder.groupBy()}"
+          class="shrink-0 rounded-xl border border-transparent bg-gray-50/80 p-2 px-6 py-2 text-sm transition-colors dark:bg-white/5"
+          th:classappend="${#lists.contains(param.group, group.metadata.name) ? '!bg-white !text-gray-900 dark:!bg-slate-700/70 dark:!text-slate-100' : ''}"
+        >
+          <a th:href="@{|/photos?group=${group.metadata.name}|}" th:text="${group.spec.displayName}"></a>
+        </button>
+      </div>
+      <ul class="columns-1 gap-4 transition-opacity duration-500 sm:columns-2 sm:gap-6 lg:columns-3 *:mb-4 *:sm:mb-6" id="photos-container">
+        <li
+          class="photo-item group relative translate-y-4 cursor-pointer overflow-hidden rounded-xl opacity-0 shadow-lg transition-all duration-700 hover:-translate-y-1 hover:shadow-2xl"
+          th:each="photo : ${photos.items}"
+        >
+          <img
+            class="h-auto w-full break-inside-avoid transition-transform duration-500 group-hover:scale-105 group-active:scale-105"
+            sizes="(max-width: 1200px) 100vw, 1200px"
+            th:alt="${photo.spec.displayName}"
+            th:src="${photo.spec.url}"
+            th:srcset="|${thumbnail.gen(photo.spec.url, 's')} 400w, ${thumbnail.gen(photo.spec.url, 'm')} 800w, ${thumbnail.gen(photo.spec.url, 'l')} 1200w|"
+          />
+          <div
+            class="absolute inset-x-0 bottom-0 translate-y-full bg-linear-to-t from-black/80 via-black/40 to-transparent p-4 transition-transform duration-300 group-hover:translate-y-0"
+          >
+            <div class="mb-2 flex items-center text-xs text-white/80">
+              <i class="fas fa-clock mr-1.5"></i>
+                <th:block th:replace="~{modules/module :: formatDate(${photo.metadata.creationTimestamp})}" />
+            </div>
+            <p class="text-sm font-medium text-white" th:text="${photo.spec.description}"></p>
+          </div>
+        </li>
+      </ul>
+
+      <th:block th:if="${#lists.isEmpty(param.group) && photos.hasNext()}">
+        <div class="mt-8 text-center" id="load-more-container"></div>
+        <div class="h-20" id="scroll-trigger"></div>
+      </th:block>
+      <th:block th:if="${!#lists.isEmpty(param.group)}" th:replace="~{modules/module :: pagination(pagination=${photos})}" />
+    </section>
+    <th:block th:replace="~{modules/footer}" />
+    <script th:inline="javascript">
+       document.addEventListener("DOMContentLoaded", () => {
+        const group = new URLSearchParams(location.search).get('group');
+
+        if (!group) {
+          initPhotoLazyLoad();
+          const instance = initLoadMoreForPage({
+            postsContainerSelector: '#photos-container',
+            getNextPageUrl: page => `/photos/page/${page}`,
+            postSelector: '.photo-item',
+            minPostsThreshold: 1,
+            skipContentFilter: true,
+            onInsert: nodes => {
+              nodes.forEach(n => setTimeout(() => n.classList.remove('opacity-0', 'translate-y-4'), 50));
+              initPhotoLazyLoad();
+            },
+            i18n: {
+              text: /*[[#{widget.loadMore.text}]]*/,
+              loading: /*[[#{widget.loadMore.loading}]]*/,
+              complete: /*[[#{widget.loadMore.complete}]]*/,
+              error: /*[[#{widget.loadMore.error}]]*/
+            }
+          });
+
+          if (instance) {
+            setTimeout(() => {
+              const trigger = document.getElementById('scroll-trigger');
+              const btn = document.getElementById('load-more-btn');
+              if (trigger && btn) {
+                new IntersectionObserver(entries => {
+                  if (entries[0].isIntersecting && !instance.isLoading) btn.click();
+                }, { rootMargin: '200px', threshold: 0.1 }).observe(trigger);
+              }
+            }, 100);
+          }
+        } else {
+          initPhotoLazyLoad();
+        }
+      });
+    </script>
+  </th:block>
+</html>

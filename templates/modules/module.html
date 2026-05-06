@@ -1,0 +1,158 @@
+<th:block th:fragment="postBlog(posts,displayType,shortDate)">
+  <li th:each="post : ${posts}" th:attr="id=|post-${post.metadata.name}|">
+    <div class="group overflow-hidden rounded-2xl border border-gray-200/70 bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-white/10 dark:bg-white/5 dark:hover:shadow-black/30">
+      <img alt="" class="h-40 w-full object-cover sm:h-48 lg:h-40 xl:h-36" loading="lazy" th:src="${post.spec.cover}" th:alt="${post.spec.title}" />
+      <div class="p-4">
+        <h2 class="text-lg font-bold leading-snug text-gray-900 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-300 md:text-xl">
+          <a th:href="@{${post.status.permalink}}" th:text="${post.spec.title}"></a>
+        </h2>
+        <p class="mt-2 line-clamp-2 text-sm leading-relaxed text-gray-600 dark:text-white/70" th:text="${post.status.excerpt}"></p>
+      </div>
+    </div>
+  </li>
+</th:block>
+
+<th:block th:fragment="postList(posts,displayType)">
+  <li th:each="post : ${posts}" th:attr="id=|post-${post.metadata.name}|" class="py-6 first:pt-0 last:pb-0">
+    <a th:href="@{${post.status.permalink}}" class="group flex items-start gap-4 transition-all duration-200 hover:opacity-90">
+      <div class="flex-none w-20 h-20 md:w-24 md:h-24 overflow-hidden rounded-xl bg-gray-200 dark:bg-white/10">
+        <th:block th:if="${not #strings.isEmpty(post.spec.cover)}">
+          <img th:src="${thumbnail.gen(post.spec.cover, 's')}" th:alt="${post.spec.title}" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+        </th:block>
+        <th:block th:if="${#strings.isEmpty(post.spec.cover)}">
+          <div class="flex h-full w-full items-center justify-center text-gray-400 dark:text-gray-500">
+            <i class="fas fa-file-lines text-xl"></i>
+          </div>
+        </th:block>
+      </div>
+      <div class="min-w-0 flex-1">
+        <h3 class="text-base md:text-lg font-semibold text-gray-900 dark:text-white/90 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2" th:text="${post.spec.title}"></h3>
+        <div class="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1.5 text-xs md:text-sm text-gray-500 dark:text-gray-400">
+          <th:block th:each="categories : ${post.categories}">
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300 text-xs font-medium" th:text="${categories.spec.displayName}"></span>
+          </th:block>
+          <span>·</span>
+          <th:block th:replace="~{this :: formatDate(${post.spec.publishTime})}" />
+        </div>
+        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400 line-clamp-2 leading-relaxed" th:text="${post.status.excerpt}"></p>
+      </div>
+    </a>
+  </li>
+</th:block>
+
+<th:block th:fragment="pagination(pagination)">
+  <nav class="mt-8 flex items-center justify-center gap-6">
+    <a
+      th:href="${pagination.hasPrevious() ? pagination.prevUrl : 'javascript:void(0)'}"
+      th:classappend="${!pagination.hasPrevious() ? 'opacity-50 cursor-not-allowed' : ''}"
+      class="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-medium text-gray-900 shadow-sm transition-all dark:bg-white/10 dark:text-white/70"
+    >
+      <i class="fas fa-chevron-left mr-2"></i>
+      <span th:text="#{common.previous}"></span>
+    </a>
+    <div class="inline-flex items-center gap-1 rounded-xl bg-white px-4 py-3 shadow-sm dark:bg-white/10">
+      <span class="text-sm font-bold text-gray-900 dark:text-white" th:text="${pagination.page}"></span>
+      <span class="text-xs text-gray-400 dark:text-gray-500">/</span>
+      <span class="text-sm text-gray-500 dark:text-gray-400" th:text="${pagination.totalPages}"></span>
+    </div>
+    <a
+      th:href="${pagination.hasNext() ? pagination.nextUrl : 'javascript:void(0)'}"
+      th:classappend="${!pagination.hasNext() ? 'opacity-50 cursor-not-allowed' : ''}"
+      class="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-medium text-gray-900 shadow-sm transition-all dark:bg-white/10 dark:text-white/70"
+    >
+      <span th:text="#{common.next}"></span>
+      <i class="fas fa-chevron-right ml-2"></i>
+    </a>
+  </nav>
+</th:block>
+
+<th:block th:fragment="categoryCard(cat)">
+  <li class="group space-y-3 overflow-hidden rounded-2xl bg-gray-400/5 p-4 backdrop-blur-sm transition-all duration-300 ease-out hover:-translate-y-2 dark:bg-white/5">
+    <div class="flex items-center justify-between">
+      <div th:with="fontIcon=${#annotations.getOrDefault(cat, 'font', '')},colorClass = ${#annotations.getOrDefault(cat, 'color', '')}" class="flex items-center">
+        <div th:if="${not #strings.isEmpty(fontIcon)}" th:utext="${fontIcon}" class="size-4"></div>
+        <i
+          th:if="${#strings.isEmpty(fontIcon)}"
+          class="fas fa-folder-open"
+          th:classappend="${not #strings.isEmpty(colorClass) ? colorClass : 'text-gray-500'}"
+          th:style="${not #strings.isEmpty(colorClass) ? 'background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;' : ''}"
+        ></i>
+        <span class="ml-1 text-sm font-medium" th:text="${cat.spec.displayName}"></span>
+      </div>
+      <div class="flex items-center space-x-0.5 text-xs text-gray-500 dark:text-gray-400">
+        <i class="fas fa-file-alt text-gray-400 dark:text-gray-500"></i>
+        <span th:text="${cat.status?.visiblePostCount ?: 0} + ' ' + #{page.archives.title.post}"></span>
+      </div>
+    </div>
+    <p class="line-clamp-1 text-sm text-gray-500" th:if="${!#strings.isEmpty(cat.spec.description)}" th:text="${cat.spec.description}"></p>
+    <p class="line-clamp-1 text-sm text-gray-500" th:unless="${!#strings.isEmpty(cat.spec.description)}" th:text="#{page.categories.other}"></p>
+    <div class="rounded-md bg-gray-50/80 p-2 dark:bg-white/5" th:with="posts = ${postFinder.listByCategory(1,1,'__${cat.metadata.name}__')}">
+      <dl class="text-gray-500 dark:text-gray-400" th:each="post : ${posts.items}" th:if="${postStat.index == 0}">
+        <dt class="flex items-center space-x-0.5 text-xs">
+          <i class="fas fa-clock"></i>
+          <span class="text-xs" th:replace="~{this :: formatDate(${post.spec.publishTime})}"></span>
+        </dt>
+        <dd class="text-xs">
+          <a
+            class="flex items-center justify-between transition duration-300 group-hover:text-black dark:group-hover:text-white"
+            th:href="@{${cat.status.permalink}}"
+          >
+            <span class="text-sm font-medium" th:text="${post.spec.title}"></span>
+            <div>
+              <span th:text="#{page.categories.morePosts}"></span>
+              <i class="fas fa-arrow-right"></i>
+            </div>
+          </a>
+        </dd>
+      </dl>
+      <div class="text-xs text-gray-500 dark:text-gray-400" th:if="${#lists.isEmpty(posts.items)}">
+        <dt class="flex items-center space-x-0.5 text-xs">
+          <i class="fas fa-clock"></i>
+          <span class="text-xs" th:text="#{page.categories.empty}"></span>
+        </dt>
+        <dd class="text-xs">
+          <a
+            class="flex items-center justify-between transition duration-300 group-hover:text-black dark:group-hover:text-white"
+            th:href="@{${cat.status.permalink}}"
+          >
+            <span class="text-sm font-medium" th:text="#{page.categories.null}"></span>
+            <div>
+              <span th:text="#{page.categories.morePosts}"></span>
+              <i class="fas fa-arrow-right"></i>
+            </div>
+          </a>
+        </dd>
+      </div>
+    </div>
+  </li>
+</th:block>
+
+<th:block th:fragment="formatDate(date)">
+  <th:block th:if="${#locale.language == 'zh'}"
+    th:text="#{page.archives.date_zh(${#dates.format(date,'dd')},${#dates.format(date,'MM')},${#dates.format(date,'yyyy')})}" />
+  <th:block th:if="${#locale.language != 'zh'}"
+    th:text="#{page.archives.date(${#dates.format(date,'dd')},${#dates.format(date,'MMM')},${#dates.format(date,'yyyy')})}" />
+</th:block>
+
+<th:block th:fragment="pageHeader(prefix, pageKey, iconClass, iconSrc, iconAlt)">
+  <div class="mt-16 bg-gray-400/5 px-4 py-12 sm:px-6 sm:py-16 lg:px-8 dark:bg-white/5">
+    <div class="mx-auto max-w-3xl">
+      <div class="flex flex-col items-center justify-center space-y-4">
+        <div class="page-icon">
+          <i th:if="${iconClass}" th:class="${iconClass}"></i>
+          <img th:unless="${iconClass}" class="h-full w-full rounded-xl bg-cover md:rounded-2xl" th:alt="${iconAlt}" th:src="${iconSrc}" />
+        </div>
+        <th:block th:with="paSetting = ${theme.config.page_setting.pa_setting}">
+          <h1
+            class="text-2xl font-bold text-gray-900/70 sm:text-3xl dark:text-white/70"
+            th:text="|${paSetting != null and paSetting.__${prefix}___enabled == true and paSetting.__${prefix}___title != null and paSetting.__${prefix}___title != ''}| ? |${paSetting.__${prefix}___title}| : |#{page.__${pageKey}__.title}|"
+          ></h1>
+          <p
+            class="text-center text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300"
+            th:text="|${paSetting != null and paSetting.__${prefix}___enabled == true and paSetting.__${prefix}___subtitle != null and paSetting.__${prefix}___subtitle != ''}| ? |${paSetting.__${prefix}___subtitle}| : |#{page.__${pageKey}__.subtitle}|"
+          ></p>
+        </th:block>
+      </div>
+    </div>
+  </div>
+</th:block>

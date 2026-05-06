@@ -1,0 +1,27 @@
+apiVersion: theme.halo.run/v1alpha1
+kind: Theme
+metadata:
+  name: theme-mindlynx
+spec:
+  displayName: MindLynx
+  author:
+    name: MindLynx
+    website: https://www.mindlynx.top
+  description: MindLynx 开源模型探索站专属主题 — 基于 MEGO 深度定制
+  logo: /themes/theme-mindlynx/assets/images/mindlynx_logo.svg
+  homepage: https://www.mindlynx.top
+  repo: https://github.com/Mindlx/theme-mindlynx
+  issues: https://github.com/Mindlx/theme-mindlynx/issues
+  settingName: "theme-mindlynx-setting"
+  configMapName: "theme-mindlynx-configMap"
+  version: 1.0.0
+  requires: ">=2.22.4"
+  license:
+    - name: "GPL-3.0"
+      url: "https://github.com/Mindlx/theme-mindlynx/blob/main/LICENSE"
+  customTemplates:
+    page:
+      - name: AboutME
+        description: 展示个人信息
+        screenshot:
+        file: resume.html

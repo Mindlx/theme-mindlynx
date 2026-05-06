@@ -1,0 +1,27 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(title = |#{page.moments.title} - ${site.title}|, hero = null, content = ~{::content}, head = null, footer = null, sidebar = null, contentClass = '')}"
+>
+  <th:block th:fragment="content">
+    <th:block th:replace="~{modules/header}" />
+    <th:block th:replace="~{modules/module :: pageHeader(prefix='pm', pageKey='moments', iconClass=null, iconSrc=@{/assets/images/moments.svg}, iconAlt='moments')}" />
+    <section class="mx-auto max-w-4xl px-2 py-8 md:px-4">
+      <ul class="space-y-6">
+        <th:block th:replace="~{modules/moment-list :: momentCard(${moment})}" />
+      </ul>
+    </section>
+    <th:block th:replace="~{modules/shareModal}" />
+    <th:block th:replace="~{modules/footer}" />
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const momentUpvote = new Upvote("halo.upvoted.moment.names", "moments", undefined, {}, "moment.halo.run", {
+          headerBtnAttr: '[data-moment-name="{name}"]',
+          header: '[data-moment-upvote="{name}"]',
+        });
+        momentUpvote.init();
+        setTimeout(() => shareModalInstance(), 100);
+      });
+    </script>
+  </th:block>
+</html>
