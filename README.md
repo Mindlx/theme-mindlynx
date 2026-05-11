@@ -1,7 +1,7 @@
- <div align="center">
+<div align="center">
   <h1>THEME-MINDLYNX</h1>
   <p style="font-weight:500;">
-    一款基于 Halo 建站工具的现代化简约主题，深度定制自 MEGO，专为 MindLynx 开源模型探索站打造
+    MindLynx 开源模型探索站专属主题，一款现代化、功能丰富的 Halo 博客主题
   </p>
 </div>
 
@@ -10,21 +10,21 @@
 <p align="center">
   <a href="https://halo.run" target="_blank">
     <img
-      src="https://img.shields.io/badge/dynamic/yaml?label=Halo&query=%24.spec.requires&url=https://raw.githubusercontent.com/w-flac/theme-mego/master/theme.yaml&color=113,195,71"
+      src="https://img.shields.io/badge/dynamic/yaml?label=Halo&query=%24.spec.requires&url=https://raw.githubusercontent.com/Mindlx/theme-mindlynx/master/theme.yaml&color=113,195,71"
       alt="Halo"
     >
   </a>
 
-  <a href="https://github.com/w-flac/theme-mego/releases" target="_blank">
+  <a href="https://github.com/Mindlx/theme-mindlynx/releases" target="_blank">
     <img
-      src="https://img.shields.io/github/v/release/w-flac/theme-mego?include_prereleases"
+      src="https://img.shields.io/github/v/release/Mindlx/theme-mindlynx?include_prereleases"
       alt="Release"
     >
   </a>
 
-  <a href="https://github.com/w-flac/theme-mego/blob/main/LICENSE" target="_blank">
+  <a href="https://github.com/Mindlx/theme-mindlynx/blob/main/LICENSE" target="_blank">
     <img
-      src="https://img.shields.io/github/license/w-flac/theme-mego"
+      src="https://img.shields.io/github/license/Mindlx/theme-mindlynx"
       alt="GPL-3 License"
     >
   </a>
@@ -32,7 +32,7 @@
 
 <p align="center">
   <a href="https://www.mindlynx.top" target="_blank">
- <  主题预览  >
+    &lt; 主题预览 &gt;
   </a>
 </p>
 
@@ -66,9 +66,9 @@
 ---
 
 ## 💬 关于
-本主题基于 [theme-mego](https://github.com/w-flac/theme-mego) 深度定制，由 MindLynx 维护。
+本主题由 MindLynx 维护。
 
-上游项目：
+上游项目致谢：
 - 原作者：無.Flac
-- 上游仓库：https://github.com/w-flac/theme-mego
+- 上游仓库：[theme-mego](https://github.com/w-flac/theme-mego)
 - GPL-3.0 协议
